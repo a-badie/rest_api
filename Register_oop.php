@@ -8,8 +8,6 @@
         private $email;
         private $password;
         private $connection;
-        private $sql;
-        private $result;
         private $hash;
         private $sql_insert;
         private $result_insert;
@@ -33,50 +31,19 @@
                 exit;
             }
         }
-    
 
-        // validation password - email correct - email repeate
-        public function validation(){
-            if($this->name && $this->password && $this->email){
-                //validation password
-                if(strlen($this->password)<=6){
-                    echo json_encode([
-                    "status"=>"error",
-                    "message"=>"password weak"
-                    ]);
-                    exit;
-                //validation email correct or not
-                }else{
-                    if(!filter_var($this->email,FILTER_VALIDATE_EMAIL)){
-                        echo json_encode([
-                        "status"=>"error",
-                        "message"=>"email not correct"
-                        ]);
-                        exit;
-                    // validate email repeate or not
-                    }else{
-                        $this->sql="select * from user_information where email=?";
-                        $this->result=$this->connection->prepare($this->sql);
-                        $this->result->execute([$this->email]);
-                        if($this->result->rowCount()>0){
-                            echo json_encode([
-                            "status"=>"error",
-                            "message"=>"email already exists"
-                            ]);
-                            exit;
-                        }
-                    }      
-                }
-            }else{
-            echo json_encode([
-            "status"=>"error",
-            "message"=>"data not complete"
-            ]);
-            exit;
-            }
-        
+        public function setname(){
+            return $this->name;
         }
 
+        public function setemail(){
+            return $this->email;
+        }
+
+        public function setpassword(){
+            return $this->password;
+        }
+    
         // hash password
         public function hash(){
             $this->hash=password_hash($this->password,PASSWORD_DEFAULT);
