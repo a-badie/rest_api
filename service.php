@@ -1,48 +1,32 @@
 <?php
 
-    class service extends user{
+    class service {
 
-        private $repo;
-        private $user;
-        private $information;
+        private $password;
 
-        public function __construct(user $user){
-            $this->user =$user;
-            $this->repo = new repository(new database(), $user);
+        public function __construct($user){
+            $this->ser = $user;
         }
 
-        public function checkPassword(){
-            if(strlen($this->user->getpassword())<=6){
-                $this->response(["message" => "password is too weak"],"error");
-            }
+        public function response($status,$message){
+            echo json_encode([
+                "status" => $status,
+                "message" => $message
+            ]);
+            exit;
         }
 
-        public function compare_password(){
-            $this->repo->selectResult(); 
-            $this->information = $this->repo->getinfo();
-
-            if (!$this->information || !isset($this->information["PASSWORD"])) {
-                $this->user->response(["message" => "No user found or password missing"], "error");
-            }
-
-            $userPass = $this->user->getpassword();
-            $hashedPass = $this->information["PASSWORD"];
-            $verify = password_verify($userPass, $hashedPass) ? "true" : "false";
-
-            file_put_contents("debug_password_check.txt", 
-                "USER_PASS: " . $userPass . "\n" .
-                "HASHED_PASS: " . $hashedPass . "\n" .
-                "VERIFY_RESULT: " . $verify
-            );
-
-            if(!$verify){
-                $this->user->response(["message" => "incorrect password"],"error");
-            }
-        }
-
-        public function email_test(){
-            if(!filter_var($this->user->getemail(),FILTER_VALIDATE_EMAIL)){
-                $this->user->response(["message" => "email not correct"],"error");
+        // handle request:
+        public function handleRequest(){
+            if($_SERVER["REQUEST_METHOD"]=="POST"){
+                $name = $_POST["name"] ?? null;
+                $this->ser->setName($name);
+                $email = $_POST["email"] ?? null;
+                $this->ser->setEmail($email);
+                $password = $_POST["password"] ?? null;
+                $this->ser->setPassword($password);
+            }else{
+                $this->response("error","method must be post");
             }
         }
     }
