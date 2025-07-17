@@ -1,77 +1,106 @@
 <?php
 
-    class repository{
+    class repository {
         
-        private $user;
-        private $db;
-        private $conn;
-        private $token;
-        private $info;
-        private $result;
+        private $repo1;
+        private $repo2;
+        private $repo3;
+        private $repeat;
         private $hashd;
-        private $result_insert;
+        private $info;
+        private $token;
 
+                            //Register page
 
-        public function __construct(database $db , user $user){
-            $this->db = $db;
-            $this->user = $user;
+        public function __construct($user,$service,$database){
+            $this->repo1 = $user;
+            $this->repo2 = $service;
+            $this->repo3 = $database;
         }
 
+        // verify the data complete or not in register:
+        public function verifyTheDataRegister(){
+            if(!$this->repo1->getName() || !$this->repo1->getEmail() || !$this->repo1->getPassword()){
+                $this->repo2->response("error","The entered data not complete");
+            }
+        }
+
+        //verify the password characters > 6 in register:
+        public function checkPassword(){
+            if(strlen($this->repo1->getPassword())<=6){
+                $this->repo2->response("error","password is too weak");
+            }
+        }
+
+        //verify syntax of email correct or not in register:
+        public function syntaxOfEmail(){
+            if(!filter_var($this->repo1->getEmail(),FILTER_VALIDATE_EMAIL)){
+                $this->repo2->response("error","email not correct");
+            }
+        }
+
+        //verify email repeate or not:
         public function email_reapet(){
-            $this->result = $this->db->select($this->user->getemail());
-            if($this->result->rowCount()>0){
-                $this->user->response(["message" => "email already exists"],"error");
+            $this->repeate = $this->repo3->select($this->repo1->getEmail());
+            if($this->repeate->rowCount()>0){
+                $this->repo2->response("error","email already exists");
             }
         }
 
-        public function email_exist(){
-            if($this->db->select($this->user->getemail())->rowCount()==0){
-                $this->user->response(["message" => "email not found"],"error");
-            }
-        }
-
-        public function selectResult(){
-            $email = $this->user->getemail();
-            // ✅ اطبع الإيميل عشان تتأكد إنه بيوصل صح
-            echo json_encode(["email_received" => $email]);
-            $this->result = $this->db->select($email);
-        }
-
-        public function getinfo(){
-            return $this->info = $this->result->fetch(PDO::FETCH_ASSOC);
-        }
-
+        // convert normal password to password hashd:
         public function hash(){
-            return $this->hashd=password_hash($this->user->getpassword(),PASSWORD_DEFAULT);
+            return $this->hashd=password_hash($this->repo1->getPassword(),PASSWORD_DEFAULT);
         }
 
-
-        public function insert_tokens(){
-            $this->token = $this->db->generationToken();
-            $this->selectResult();
-            $this->info = $this->getinfo();
-            if($this->db->insert_token($this->token,$this->info["id"])){
-                    $this->user->response([
-                        "message" => "info",
-                        "info" => [
-                            "id" => $this->info["id"],
-                            "name" => $this->info["name"],
-                            "email" => $this->info["email"]
-                        ]
-                    ], "success");
-                } else {
-                    $this->user->response(["message" => "should use post method"],"error");
-                }
-        }
-
-        public function insert_data(){
-            $success = $this->db->register_insert($this->user->getname(),$this->user->getemail(),$this->hash());
-            if($success){
-                $this->user->response(["message" => "sucess register"],"sucess");
+        //return the resulo of register
+        public function returnMessage(){
+            $insert=$this->repo3->register_insert($this->repo1->getName(),$this->repo1->getEmail(),$this->hash());
+            if($insert){
+                $this->repo2->response("success","sucess register");
             }else{
-                $this->user->response(["message" => "failed register"],"error");
-            };
+                $this->repo2->response("failed","failed register");
+            }
         }
+
+                            //Login page
+
+        // verify the data complete or not in login:
+        public function verifyTheDataLogin(){
+            if(!$this->repo1->getEmail() || !$this->repo1->getPassword()){
+                $this->repo2->response("error","The entered data not complete");
+            }
+        } 
+
+        //verify email exists or not:
+        public function email_exist(){
+            if($this->repo3->select($this->repo1->getEmail())->rowCount()==0){
+                $this->repo2->response("error","email not found");
+            }
+        }
+
+        //return one row of data
+        public function getinfo(){
+            $this->info = $this->repo3->select($this->repo1->getEmail())->fetch(PDO::FETCH_ASSOC);
+            return $this->info;
+        }
+
+        //compare between password in table and user inter in login page
+        public function compare_password(){
+            if(!password_verify($this->repo1->getPassword(),$this->info["PASSWORD"])){
+                $this->repo2->response("error","password error");
+            }
+        }
+
+        //method return value of insert token
+        public function returnInsertTokens(){
+            $this->token = $this->repo3->generationToken();
+            $this->getinfo();
+            if($this->repo3->insert_token($this->token,$this->info["id"])){
+                    $this->repo2->response("sucess","sucess insert tokens");
+                } else {
+                    $this->repo2->response("failed","failed insert tokens");
+                }
+        }  
     }
     
 ?>
