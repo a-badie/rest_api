@@ -6,47 +6,30 @@
         private $email;
         private $password;
 
-        public function getname(){
+        public function setName($name){
+            $this->name = $name;
+        }
+
+        public  function setEmail($email){
+            $this->email = $email;
+        }
+
+        public function setPassword($password){
+            $this->password = $password;
+        }
+
+        public function getName(){
             return $this->name;
         }
 
-        public function getemail(){
+        public function getEmail(){
             return $this->email;
         }
 
-        public function getpassword(){
+        public function getPassword(){
             return $this->password;
         }
-
-        public function response($data,$status){
-            echo json_encode([
-                "status" => $status,
-                ...$data
-            ]);
-            exit;
-        }
-
-        public function handleRequest(){
-            if($_SERVER["REQUEST_METHOD"]=="POST"){
-                $this->name = $_POST["name"] ?? null;
-                $this->email = $_POST["email"] ?? null;
-                $this->password = $_POST["password"] ?? null;
-            }else{
-                $this->response(["message" => "method must be post"],"error");
-            }
-        }
-
-        public function verifyTheDataRegister(){
-            if(!$this->name || !$this->email || !$this->password){
-                $this->response(["message" => "The entered data is incomplete"],"error");
-            }
-        }
-
-        public function verifyTheDataLogin(){
-            if(!$this->email || !$this->password){
-                $this->response(["message" => "The entered data is incomplete"],"error");
-            }
-        }      
+    
     }
 
 ?>
