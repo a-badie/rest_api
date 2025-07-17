@@ -1,23 +1,23 @@
 <?php
 
-require_once("user.php");
-require_once("service.php");
-require_once("db.php");
-require_once("repository.php");
+    header("Content-Type: application/json");
+    require_once("user.php");
+    require_once("service.php");
+    require_once("db.php");
+    require_once("repository.php");    
 
-$user = new user();
-$user->handleRequest();
-$user->verifyTheDataLogin();
+    $regist1 = new user();
 
-$db = new database();
-$repo = new repository($db, $user);
-$repo->email_exist();
-$repo->selectResult();
+    $regist2 = new service($regist1);
+    $regist2->handleRequest();
 
-$service = new service($user); // خليه ياخد نفس الكائن user مش يعمل واحد جديد
-$service->compare_password();
+    $regist3 = new database();
 
-$repo->insert_tokens();
-
+    $regist4 = new repository($regist1,$regist2,$regist3);
+    $regist4->verifyTheDataLogin();
+    $regist4->email_exist();
+    $regist4->getinfo();
+    $regist4->compare_password();
+    $regist4->returnInsertTokens();
 
 ?>
