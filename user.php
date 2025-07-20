@@ -2,9 +2,7 @@
 
     class user{
 
-        private $name;
-        private $email;
-        private $password;
+        private $name, $email, $password;
 
         public function setName($name){
             $this->name = $name;
