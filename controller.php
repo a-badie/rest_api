@@ -3,13 +3,9 @@
     class controller{
 
         private $user;
-        private $service;
-        private $message;
-        private $message_token;
 
-        public function __construct($user,$service){
+        public function __construct($user){
                 $this->user = $user;
-                $this->service = $service;
         }
 
         public function handleRequest(){
@@ -21,21 +17,21 @@
                 $password = $_POST["password"] ?? null;
                 $this->user->setPassword($password);
             }else{
-                echo json_encode([
-                    "status"=>"error",
-                    "message"=>"method must be post"
-                ]);
-                exit;
+                return ["status" => "error", "message" => "method must be post"];
             }
         }
 
-        public function getmessage(){
-            return $this->message = $this->service->returnMessage($this->user->getName(),$this->user->getEmail(),$this->user->getPassword());
+        public function verifyTheDataRegister(){
+            if(!$this->user->getName() || !$this->user->getEmail() || !$this->user->getPassword()){
+                return ["status" => "error", "message" => "you entered data not complete"];
+            }
         }
 
-        public function getmessageToken(){
-            return $this->message_token = $this->service->returnInsertTokens();
-        }
+        public function verifyTheDataLogin(){
+            if(!$this->user->getEmail() || !$this->user->getPassword()){
+                return ["status" => "error", "message" => "you entered data not complete"];
+            }
+        } 
     }
 
 ?>
