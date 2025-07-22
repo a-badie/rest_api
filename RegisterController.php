@@ -1,6 +1,6 @@
 <?php
 
-    class controller{
+    class RegisterController{
 
         private $user;
 
@@ -8,7 +8,7 @@
                 $this->user = $user;
         }
 
-        public function handleRequest(){
+        public function handleRegisterRequest(){
             if($_SERVER["REQUEST_METHOD"]=="POST"){
                 $name = $_POST["name"] ?? null;
                 $this->user->setName($name);
@@ -26,12 +26,6 @@
                 return ["status" => "error", "message" => "you entered data not complete"];
             }
         }
-
-        public function verifyTheDataLogin(){
-            if(!$this->user->getEmail() || !$this->user->getPassword()){
-                return ["status" => "error", "message" => "you entered data not complete"];
-            }
-        } 
     }
 
 ?>
