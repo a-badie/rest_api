@@ -2,28 +2,30 @@
 
     class LoginController{
 
-        private $user;
+        private $service;
 
-        public function __construct($user){
-                $this->user = $user;
+        public function __construct($service){
+                $this->service = $service;
         }
 
         public function handleLoginRequest(){
-            if($_SERVER["REQUEST_METHOD"]=="POST"){
+
+            if($_SERVER["REQUEST_METHOD"] !=="POST"){
+                echo json_encode(["error" => "method must be post"]);
+                exit;
+            }
                 $email = $_POST["email"] ?? null;
-                $this->user->setEmail($email);
-                $password = $_POST["password"] ?? null;
-                $this->user->setPassword($password);
-            }else{
-                return ["status" => "error", "message" => "method must be post"];
-            }
+                $password = $_POST["password"] ?? null; 
+                
+                try {
+                    $this->service->Login_result($email, $password);
+                    echo json_encode(["success" => "success Login"]);
+                    
+                } catch (PDOException $e){
+                    echo json_encode(["error" => $e->getMessage()]);
+                } catch (Exception $e) {
+                    echo json_encode(["error" => $e->getMessage()]);
+                }
         }
-
-        public function verifyTheDataLogin(){
-            if(!$this->user->getEmail() || !$this->user->getPassword()){
-                return ["status" => "error", "message" => "you entered data not complete"];
-            }
-        } 
     }
-
 ?>

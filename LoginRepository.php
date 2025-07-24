@@ -2,27 +2,27 @@
 
     class LoginRepository {
 
-        private $repo;
-        private $token_insert;
-        private $token_result;
+        private $database;
 
         public function __construct($database){
-            $this->repo = $database;
+            $this->database = $database;
         }
 
-        public function select($email){
-            $this->sql="select * from user_information where email=?";
-            $this->result=$this->repo->getConnection()->prepare($this->sql);
-            $this->result->execute([$email]);
-            return $this->result;
+        public function getUserByEmail($email){
+            $sql_select="select * from user_information where email=?";
+            return $this->database->query($sql_select,[$email]);
+        }
+
+        public function getInfo($email){
+            return $info = $this->getUserByEmail($email)->fetch(PDO::FETCH_ASSOC);
         }
         
-        public function insert_token($token,$user_id){
-            $this->token_insert = "INSERT INTO token (token, user_id) VALUES (?, ?)";
-            $this->token_result = $this->repo->getConnection()->prepare($this->token_insert);
-            $this->token_result->execute([$token,$user_id]);
-            return $this->token_result;
+        public function insertToken($token,$user_id){
+            $token_insert = "INSERT INTO token (token, user_id) VALUES (?, ?)";
+            return $this->database->query($token_insert,[$token,$user_id]);
         }
+
+        
     }
     
 ?>
